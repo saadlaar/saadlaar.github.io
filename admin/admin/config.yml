@@ -1,0 +1,26 @@
+backend:
+  name: turbo-github
+  turbo_site_id: 7981072d-730e-4518-a030-1f6c449cc527
+  branch: main
+
+site_url: https://saadlaar.github.io
+display_url: https://saadlaar.github.io
+
+media_folder: "assets/images"
+public_folder: "/assets/images"
+
+collections:
+  - name: "profile"
+    label: "Personal Profile"
+    files:
+      - name: "personal"
+        label: "Personal Information"
+        file: "content/profile.yml"
+        fields:
+          - { label: "Full Name", name: "name", widget: "string" }
+          - { label: "Biography", name: "bio", widget: "text" }
+          - { label: "Location", name: "location", widget: "string" }
+          - { label: "Email", name: "email", widget: "string", required: false }
+          - { label: "Instagram", name: "instagram", widget: "string", required: false }
+          - { label: "Facebook", name: "facebook", widget: "string", required: false }
+          - { label: "WhatsApp", name: "whatsapp", widget: "string", required: false }
