@@ -35,3 +35,36 @@ OUTPUT_FILE.write_text(
 )
 
 print(f"Gallery updated: {len(photos)} photographs found.")
+
+async function loadGallery() {
+    try {
+        const response = await fetch('./Gallery.json');
+
+        if (!response.ok) {
+            throw new Error('Failed to load Gallery.json');
+        }
+
+        const data = await response.json();
+
+        const galleryContainer =
+            document.getElementById('gallery-container');
+
+        galleryContainer.innerHTML = data.gallery.map(item => `
+            <div class="gallery-item">
+                <img
+                    src="${item.image}"
+                    alt="${item.title}"
+                    loading="lazy"
+                >
+                <h3>${item.title}</h3>
+                <p>${item.description}</p>
+            </div>
+        `).join('');
+
+    } catch (error) {
+        console.error('Gallery error:', error);
+    }
+}
+
+loadGallery();
+
