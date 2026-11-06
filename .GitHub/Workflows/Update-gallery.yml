@@ -1,12 +1,14 @@
 
-name: Update Photo Gallery
+name: Automatically Update Gallery
 
 on:
   push:
+    branches:
+      - main
     paths:
       - 'assets/images/gallery/**'
-      - 'scripts/generate_gallery.py'
       - '.github/workflows/update-gallery.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -18,25 +20,63 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
+      - name: Generate Gallery.json
+        run: |
+          python3 <<'PY'
+          import os
+          import json
 
-      - name: Generate gallery
-        run: python scripts/generate_gallery.py
+          gallery_folder = "assets/images/gallery"
+          output_file = "Gallery.json"
 
-      - name: Save updated gallery
+          extensions = (
+              ".jpg", ".jpeg", ".png",
+              ".webp", ".gif", ".avif"
+          )
+
+          gallery = []
+
+          if os.path.exists(gallery_folder):
+              files = sorted(os.listdir(gallery_folder))
+
+              for filename in files:
+                  if filename.lower().endswith(extensions):
+                      image_path = os.path.join(
+                          gallery_folder, filename
+                      ).replace("\\", "/")
+
+                      title = os.path.splitext(filename)[0]
+                      title = title.replace("-", " ").replace("_", " ").title()
+
+                      gallery.append({
+                          "id": len(gallery) + 1,
+                          "title": title,
+                          "image": image_path,
+                          "category": "Personal",
+                          "description": title
+                      })
+
+          data = {
+              "gallery": gallery
+          }
+
+          with open(output_file, "w", encoding="utf-8") as f:
+              json.dump(data, f, indent=2, ensure_ascii=False)
+
+          print(f"Gallery updated with {len(gallery)} images.")
+          PY
+
+      - name: Commit updated gallery
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add gallery.json
+          git add Gallery.json
 
           if ! git diff --cached --quiet; then
-            git commit -m "Automatically update photo gallery"
+            git commit -m "Automatically update Gallery.json"
             git push
+          else
+            echo "Gallery.json is already up to date."
           fi
