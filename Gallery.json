@@ -1,4 +1,4 @@
-
+[
 async function loadGallery() {
     try {
         const response = await fetch('./Gallery.json');
@@ -30,4 +30,5 @@ async function loadGallery() {
 }
 
 loadGallery();
+]
 
